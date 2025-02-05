@@ -1,0 +1,65 @@
+name: remote-fetch-pull
+description: "Remote Git update via SSH: configure connection, run optional scripts, and execute git pull with reset. 🚀"
+author: "yacenturion"
+branding:
+  icon: "terminal"
+  color: "orange"
+
+inputs:
+  HOST:
+    description: "Target server hostname or IP address.."
+    required: true
+  USERNAME:
+    description: "SSH username for authentication."
+    required: true
+  SSH_KEY:
+    description: "Private SSH key for secure connection (use secrets)."
+    required: true
+  DEST_PATH:
+    description: "Absolute path to the Git repository on the target server (e.g., '/srv/super.com')."
+    required: true
+  RUN_BEFORE:
+    description: "Optional bash commands to execute before updating the Git repository."
+    required: false
+  RUN_AFTER:
+    description: "Optional bash commands to execute after updating the Git repository."
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Creating ssh key...
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ inputs.SSH_KEY }}" > ~/.ssh/target.key
+        chmod 600 ~/.ssh/target.key
+      shell: bash
+
+    - name: Setting the ssh Key...
+      run: |
+        echo ${{ inputs.HOST }}
+        cat >>~/.ssh/config <<END
+        Host target
+          HostName ${{ inputs.HOST }}
+          User ${{ inputs.USERNAME }}
+          Port 22
+          IdentityFile ~/.ssh/target.key
+          StrictHostKeyChecking no
+        END
+      shell: bash
+
+    - name: Executing commands...
+      if: ${{ inputs.RUN_BEFORE }}
+      run: ssh target "${{ inputs.RUN_BEFORE }}"
+      shell: bash
+
+    - name: Fetch and pull
+      if: always()
+      run: ssh target "git fetch --all && git pull --force && git reset --hard HEAD"
+      shell: bash
+
+    - name: Executing commands...
+      if: ${{ inputs.RUN_AFTER }}
+      run: ssh target "${{ inputs.RUN_AFTER }}"
+      shell: bash
