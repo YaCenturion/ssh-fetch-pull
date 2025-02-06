@@ -20,13 +20,15 @@ on:
     branches: [ "deploy" ]
   pull_request:
     branches: [ "deploy" ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: yacenturion/remote-fetch-pull@v1
+      - name: Update remote repo
+        uses: yacenturion/ssh-fetch-pull@v1
         with:
           HOST: "8.10.17.10"
           USERNAME: "root"
