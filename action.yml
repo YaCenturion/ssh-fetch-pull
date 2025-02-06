@@ -1,4 +1,4 @@
-name: remote-fetch-pull
+name: ssh-fetch-pull
 description: "Remote Git update via SSH: configure connection, run optional scripts, and execute git pull with reset. 🚀"
 author: "yacenturion"
 branding:
@@ -20,9 +20,11 @@ inputs:
     required: true
   RUN_BEFORE:
     description: "Optional bash commands to execute before updating the Git repository."
+    default: false
     required: false
   RUN_AFTER:
     description: "Optional bash commands to execute after updating the Git repository."
+    default: false
     required: false
 
 runs:
@@ -32,7 +34,7 @@ runs:
     - name: Creating ssh key...
       run: |
         mkdir -p ~/.ssh/
-        echo "${{ inputs.SSH_KEY }}" > ~/.ssh/target.key
+        echo -e "${{ inputs.SSH_KEY }}" > ~/.ssh/target.key
         chmod 600 ~/.ssh/target.key
       shell: bash
 
@@ -51,15 +53,18 @@ runs:
 
     - name: Executing commands...
       if: ${{ inputs.RUN_BEFORE }}
-      run: ssh target "${{ inputs.RUN_BEFORE }}"
+      run: |
+        ssh target "${{ inputs.RUN_BEFORE }}";
       shell: bash
 
     - name: Fetch and pull
       if: always()
-      run: ssh target "git fetch --all && git pull --force && git reset --hard HEAD"
+      run: |
+        ssh target "cd ${{ inputs.DEST_PATH }} && git fetch --all && git pull --force && git reset --hard HEAD";
       shell: bash
 
     - name: Executing commands...
       if: ${{ inputs.RUN_AFTER }}
-      run: ssh target "${{ inputs.RUN_AFTER }}"
+      run: |
+        ssh target "${{ inputs.RUN_AFTER }}"
       shell: bash
