@@ -1,5 +1,5 @@
 
-# 🚀 Remote Fetch & Pull GitHub Action  
+# 🚀 GitHub Action: Remote Fetch & Pull  
 
 This GitHub Action allows you to securely fetch and pull the latest changes from a remote Git repository via SSH.  
 It also supports executing custom commands **before and after** the update process.  
