@@ -31,14 +31,14 @@ runs:
   using: "composite"
   steps:
 
-    - name: Creating ssh key...
+    - name: "🔑 Creating ssh key..."
       run: |
         mkdir -p ~/.ssh/
         echo -e "${{ inputs.SSH_KEY }}" > ~/.ssh/target.key
         chmod 600 ~/.ssh/target.key
       shell: bash
 
-    - name: Setting the ssh Key...
+    - name: "📄 Setting config for host: ${{ inputs.HOST }}"
       run: |
         echo ${{ inputs.HOST }}
         cat >>~/.ssh/config <<END
@@ -51,20 +51,25 @@ runs:
         END
       shell: bash
 
-    - name: Executing commands...
+    - name: "🟨 Executing commands BEFORE update..."
       if: ${{ inputs.RUN_BEFORE }}
       run: |
-        ssh target "${{ inputs.RUN_BEFORE }}";
+        ssh target "${{ inputs.RUN_BEFORE }}"
       shell: bash
 
-    - name: Fetch and pull
+    - name: "🔄 Fetch and pull"
       if: always()
       run: |
-        ssh target "cd ${{ inputs.DEST_PATH }} && git fetch --all && git pull --force && git reset --hard HEAD";
+        ssh target "cd ${{ inputs.DEST_PATH }} && git fetch --all && git pull --force && git reset --hard HEAD"
       shell: bash
 
-    - name: Executing commands...
+    - name: "🟪 Executing commands AFTER update..."
       if: ${{ inputs.RUN_AFTER }}
       run: |
         ssh target "${{ inputs.RUN_AFTER }}"
+      shell: bash
+
+    - name: "✅ Success"
+      run: |
+        echo "All tasks completed"
       shell: bash
