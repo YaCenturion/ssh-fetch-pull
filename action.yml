@@ -40,7 +40,6 @@ runs:
 
     - name: "📄 Setting config for host: ${{ inputs.HOST }}"
       run: |
-        echo ${{ inputs.HOST }}
         cat >>~/.ssh/config <<END
         Host target
           HostName ${{ inputs.HOST }}
@@ -71,5 +70,5 @@ runs:
 
     - name: "✅ Success"
       run: |
-        echo "All tasks completed"
+        echo "✅ All tasks completed!"
       shell: bash
