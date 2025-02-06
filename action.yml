@@ -1,6 +1,6 @@
 name: ssh-fetch-pull
 description: "Remote Git update via SSH: configure connection, run optional scripts, and execute git pull with reset. 🚀"
-author: "yacenturion"
+author: "Boris Drozdovski"
 branding:
   icon: "terminal"
   color: "orange"
